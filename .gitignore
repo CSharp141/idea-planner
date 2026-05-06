@@ -34,3 +34,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# editor / AI tool configs (machine-specific)
+.codex/
+.cursor/
+.gemini/
+.vscode/
+.zed/
+opencode.json
+config/
+
+# session docs
+SESSION_HANDOFF.md
+
+# claude code mcp config
+.mcp.json
