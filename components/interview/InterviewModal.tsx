@@ -25,6 +25,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
   const [streamingContent, setStreamingContent] = useState("");
   const [input, setInput] = useState("");
   const [confirmFinish, setConfirmFinish] = useState(false);
+  const [streamError, setStreamError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -38,10 +39,17 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ project_id: projectId }),
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to start interview");
+        return r.json();
+      })
       .then((data) => {
         setSessionId(data.session_id);
         setMessages([{ role: "model", content: data.first_message, ts: new Date().toISOString() }]);
+        setStatus("idle");
+      })
+      .catch(() => {
+        setStreamError("Failed to start interview. Please close and try again.");
         setStatus("idle");
       });
   }, [open, projectId, sessionId]);
@@ -54,6 +62,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
     setInput("");
     setStatus("idle");
     setConfirmFinish(false);
+    setStreamError(null);
     onClose();
   }
 
@@ -69,44 +78,79 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
     setInput("");
     setStatus("streaming");
     setStreamingContent("");
+    setStreamError(null);
 
-    const res = await fetch(`/api/interview/${sessionId}/message`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: userMsg.content }),
-    });
+    try {
+      const res = await fetch(`/api/interview/${sessionId}/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: userMsg.content }),
+      });
 
-    const reader = res.body!.getReader();
-    const decoder = new TextDecoder();
-    let assembled = "";
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      const text = decoder.decode(value);
-      const lines = text.split("\n");
-      for (const line of lines) {
-        if (!line.startsWith("data: ")) continue;
-        const payload = line.slice(6);
-        if (payload === "[DONE]") {
-          setMessages((prev) => [
-            ...prev,
-            { role: "model", content: assembled, ts: new Date().toISOString() },
-          ]);
-          setStreamingContent("");
-          setStatus("idle");
-          break;
-        }
-        try {
-          const chunk = JSON.parse(payload);
-          if (typeof chunk === "string") {
-            assembled += chunk;
-            setStreamingContent(assembled);
-          }
-        } catch {
-          // ignore malformed lines
-        }
+      if (!res.ok || !res.body) {
+        setStreamError("Failed to reach the AI. Please try again.");
+        setStatus("idle");
+        return;
       }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let assembled = "";
+      let gotDone = false;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const text = decoder.decode(value);
+        const lines = text.split("\n");
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const payload = line.slice(6);
+          if (payload === "[DONE]") {
+            setMessages((prev) => [
+              ...prev,
+              { role: "model", content: assembled, ts: new Date().toISOString() },
+            ]);
+            setStreamingContent("");
+            setStatus("idle");
+            gotDone = true;
+            break;
+          }
+          try {
+            const chunk = JSON.parse(payload);
+            if (typeof chunk === "string") {
+              assembled += chunk;
+              setStreamingContent(assembled);
+            } else if (chunk && typeof chunk === "object" && "error" in chunk) {
+              const raw = chunk.error as string;
+              let msg = "AI error. Please try again.";
+              try {
+                const inner = JSON.parse(raw);
+                if (inner?.error?.code === 429) msg = "Gemini rate limit reached — please wait a moment and try again.";
+                else if (inner?.error?.message) msg = inner.error.message.slice(0, 120);
+              } catch { /* raw wasn't JSON */ }
+              setStreamingContent("");
+              setStreamError(msg);
+              setStatus("idle");
+              gotDone = true;
+              break;
+            }
+          } catch {
+            // ignore malformed SSE lines
+          }
+        }
+        if (gotDone) break;
+      }
+
+      if (!gotDone) {
+        setStreamingContent("");
+        setStreamError("Connection dropped. Please try again.");
+        setStatus("idle");
+      }
+    } catch {
+      setStreamingContent("");
+      setStreamError("Network error. Please check your connection and try again.");
+      setStatus("idle");
     }
   }
 
@@ -181,6 +225,11 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
             </div>
           </div>
         ))}
+        {streamError && (
+          <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-center text-sm text-red-600 dark:bg-red-950/30 dark:border-red-800 dark:text-red-400">
+            {streamError}
+          </p>
+        )}
         {status === "summarising" && (
           <div className="flex items-center justify-center gap-2 py-4 text-sm text-zinc-500">
             <Spinner className="h-4 w-4" />
