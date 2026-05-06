@@ -4,6 +4,8 @@ import { ProjectGrid } from "@/components/dashboard/ProjectGrid";
 import { TagFilterBar } from "@/components/dashboard/TagFilterBar";
 import { ProjectListItem, Tag } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 async function getProjects(tag?: string): Promise<ProjectListItem[]> {
   const supabase = createServerClient();
 
