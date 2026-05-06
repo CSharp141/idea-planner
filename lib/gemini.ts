@@ -70,6 +70,19 @@ export async function streamChatResponse(
   return fullText;
 }
 
+export async function sendInterviewMessage(messages: ChatMessage[]): Promise<string> {
+  const contents = messages.map((m) => ({
+    role: m.role as "user" | "model",
+    parts: [{ text: m.content }],
+  }));
+  const response = await ai.models.generateContent({
+    model: MODEL,
+    config: { systemInstruction: INTERVIEW_SYSTEM_PROMPT },
+    contents,
+  });
+  return response.text ?? "";
+}
+
 export async function generateSummary(messages: ChatMessage[]): Promise<string> {
   const transcript = messages
     .map((m) => `${m.role === "user" ? "User" : "Interviewer"}: ${m.content}`)
