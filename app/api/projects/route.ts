@@ -1,11 +1,11 @@
-import { Suspense } from "react";
+import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
-import { ProjectGrid } from "@/components/dashboard/ProjectGrid";
-import { TagFilterBar } from "@/components/dashboard/TagFilterBar";
-import { ProjectListItem, Tag } from "@/lib/types";
+import { upsertTags } from "@/lib/db";
+import { Tag } from "@/lib/types";
 
-async function getProjects(tag?: string): Promise<ProjectListItem[]> {
+export async function GET(req: NextRequest) {
   const supabase = createServerClient();
+  const tag = req.nextUrl.searchParams.get("tag");
 
   let projectIds: string[] | null = null;
 
@@ -16,7 +16,7 @@ async function getProjects(tag?: string): Promise<ProjectListItem[]> {
       .eq("name", tag)
       .single();
 
-    if (!tagRow) return [];
+    if (!tagRow) return NextResponse.json([]);
 
     const { data: pts } = await supabase
       .from("project_tags")
@@ -24,7 +24,7 @@ async function getProjects(tag?: string): Promise<ProjectListItem[]> {
       .eq("tag_id", tagRow.id);
 
     projectIds = (pts ?? []).map((r: { project_id: string }) => r.project_id);
-    if (projectIds.length === 0) return [];
+    if (projectIds.length === 0) return NextResponse.json([]);
   }
 
   let query = supabase
@@ -34,8 +34,8 @@ async function getProjects(tag?: string): Promise<ProjectListItem[]> {
 
   if (projectIds) query = query.in("id", projectIds);
 
-  const { data: projects } = await query;
-  if (!projects) return [];
+  const { data: projects, error } = await query;
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const { data: allPts } = await supabase
     .from("project_tags")
@@ -59,41 +59,35 @@ async function getProjects(tag?: string): Promise<ProjectListItem[]> {
     tagMap.set(pt.project_id, [...existing, ...tagList]);
   });
 
-  return projects.map((p) => ({
+  const result = (projects ?? []).map((p) => ({
     ...p,
     tags: tagMap.get(p.id) ?? [],
     has_summary: sessionMap.has(p.id),
   }));
+
+  return NextResponse.json(result);
 }
 
-async function getTags(): Promise<Tag[]> {
+export async function POST(req: NextRequest) {
   const supabase = createServerClient();
-  const { data } = await supabase.from("tags").select("id, name").order("name");
-  return data ?? [];
-}
+  const body = await req.json();
+  const { title, description, github_url, tags = [] } = body;
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { tag?: string };
-}) {
-  const [projects, tags] = await Promise.all([
-    getProjects(searchParams.tag),
-    getTags(),
-  ]);
+  if (!title?.trim()) {
+    return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">My Ideas</h1>
-        <span className="text-sm text-zinc-500">{projects.length} project{projects.length !== 1 ? "s" : ""}</span>
-      </div>
+  const { data: project, error } = await supabase
+    .from("projects")
+    .insert({ title: title.trim(), description, github_url })
+    .select()
+    .single();
 
-      <Suspense>
-        <TagFilterBar tags={tags} />
-      </Suspense>
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-      <ProjectGrid projects={projects} />
-    </div>
-  );
+  if (tags.length > 0) {
+    await upsertTags(supabase, project.id, tags);
+  }
+
+  return NextResponse.json(project, { status: 201 });
 }
