@@ -3,6 +3,8 @@ import { createServerClient } from "@/lib/supabase/server";
 import { upsertTags } from "@/lib/db";
 import { Tag } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   const supabase = createServerClient();
   const tag = req.nextUrl.searchParams.get("tag");

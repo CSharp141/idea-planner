@@ -36,6 +36,7 @@ export default function ProjectDetailPage() {
     if (!confirm("Delete this project? This cannot be undone.")) return;
     setDeleting(true);
     await fetch(`/api/projects/${params.id}`, { method: "DELETE" });
+    router.refresh();
     router.push("/");
   }
 

@@ -55,8 +55,8 @@ export function ProjectForm({ initial, mode }: ProjectFormProps) {
     }
 
     const project = await res.json();
-    router.push(`/projects/${project.id}`);
     router.refresh();
+    router.push(`/projects/${project.id}`);
   }
 
   const fieldClass =
