@@ -4,9 +4,17 @@ import { ChatMessage } from "./types";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 const MODEL = "gemini-2.0-flash";
 
-export const INTERVIEW_SYSTEM_PROMPT = `You are a thoughtful product development interviewer.
-Your job is to help the user clarify and develop a software project idea through structured conversation.
+export function buildSystemPrompt(title: string, description?: string | null): string {
+  const contextLines = [`Title: ${title}`];
+  if (description) contextLines.push(`Description: ${description}`);
 
+  return `You are a thoughtful product development interviewer.
+Your job is to help the user clarify and develop their software project idea through structured conversation.
+
+Project context:
+${contextLines.join("\n")}
+
+Use this context to frame your questions — do not ask the user to repeat information already provided above.
 Ask one focused question at a time. Do not ask multiple questions in a single message.
 Keep your questions concise (1-2 sentences max). Be encouraging but direct.
 
@@ -22,6 +30,7 @@ After covering all main topics (typically 6-8 exchanges), say:
 "I think we've covered the key areas! You can click 'Finish Interview' whenever you're ready to generate your project summary."
 
 Do not mention you are an AI. Stay in the interviewer role throughout.`;
+}
 
 export const OPENING_MESSAGE =
   "Let's develop your idea together. To start: what problem are you trying to solve with this project, and who runs into that problem?";
@@ -46,7 +55,8 @@ ${transcript}`;
 
 export async function streamChatResponse(
   messages: ChatMessage[],
-  onChunk: (chunk: string) => void
+  onChunk: (chunk: string) => void,
+  systemPrompt: string
 ): Promise<string> {
   const contents = messages.map((m) => ({
     role: m.role as "user" | "model",
@@ -55,7 +65,7 @@ export async function streamChatResponse(
 
   const result = await ai.models.generateContentStream({
     model: MODEL,
-    config: { systemInstruction: INTERVIEW_SYSTEM_PROMPT },
+    config: { systemInstruction: systemPrompt },
     contents,
   });
 
@@ -70,14 +80,14 @@ export async function streamChatResponse(
   return fullText;
 }
 
-export async function sendInterviewMessage(messages: ChatMessage[]): Promise<string> {
+export async function sendInterviewMessage(messages: ChatMessage[], systemPrompt: string): Promise<string> {
   const contents = messages.map((m) => ({
     role: m.role as "user" | "model",
     parts: [{ text: m.content }],
   }));
   const response = await ai.models.generateContent({
     model: MODEL,
-    config: { systemInstruction: INTERVIEW_SYSTEM_PROMPT },
+    config: { systemInstruction: systemPrompt },
     contents,
   });
   return response.text ?? "";

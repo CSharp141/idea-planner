@@ -1,6 +1,6 @@
 import { createServerClient } from "./supabase/server";
 import { upsertTags } from "./db";
-import { generateSummary, sendInterviewMessage, OPENING_MESSAGE } from "./gemini";
+import { generateSummary, sendInterviewMessage, OPENING_MESSAGE, buildSystemPrompt } from "./gemini";
 import { ChatMessage, InterviewSummary, Tag } from "./types";
 
 export interface McpTool {
@@ -279,11 +279,16 @@ export async function callTool(name: string, args: ToolArgs) {
 
       const { data: session, error: fetchError } = await supabase
         .from("interview_sessions")
-        .select("messages")
+        .select("messages, projects(title, description)")
         .eq("id", session_id)
         .single();
 
       if (fetchError || !session) return err("Session not found");
+
+      const sessionProject = (session.projects as unknown) as { title: string; description: string | null } | null;
+      const systemPrompt = sessionProject
+        ? buildSystemPrompt(sessionProject.title, sessionProject.description)
+        : buildSystemPrompt("Untitled project");
 
       const userMsg: ChatMessage = {
         role: "user",
@@ -294,7 +299,7 @@ export async function callTool(name: string, args: ToolArgs) {
 
       let aiResponse: string;
       try {
-        aiResponse = await sendInterviewMessage(messagesWithUser);
+        aiResponse = await sendInterviewMessage(messagesWithUser, systemPrompt);
       } catch (e) {
         return err(e instanceof Error ? e.message : "Gemini error");
       }

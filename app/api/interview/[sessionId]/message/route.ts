@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
-import { streamChatResponse } from "@/lib/gemini";
+import { streamChatResponse, buildSystemPrompt } from "@/lib/ai";
 import { ChatMessage } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -15,13 +15,18 @@ export async function POST(
 
   const { data: session, error: fetchError } = await supabase
     .from("interview_sessions")
-    .select("messages")
+    .select("messages, project_id, projects(title, description)")
     .eq("id", params.sessionId)
     .single();
 
   if (fetchError || !session) {
     return new Response(JSON.stringify({ error: "Session not found" }), { status: 404 });
   }
+
+  const project = (session.projects as unknown) as { title: string; description: string | null } | null;
+  const systemPrompt = project
+    ? buildSystemPrompt(project.title, project.description)
+    : buildSystemPrompt("Untitled project");
 
   const userMsg: ChatMessage = {
     role: "user",
@@ -44,7 +49,7 @@ export async function POST(
         await streamChatResponse(messagesWithUser, (chunk) => {
           assembledResponse += chunk;
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
-        });
+        }, systemPrompt);
 
         const modelMsg: ChatMessage = {
           role: "model",

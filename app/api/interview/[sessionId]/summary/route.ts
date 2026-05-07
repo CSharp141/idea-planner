@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
-import { generateSummary } from "@/lib/gemini";
+import { generateSummary } from "@/lib/ai";
 import { InterviewSummary } from "@/lib/types";
 
 export async function POST(
