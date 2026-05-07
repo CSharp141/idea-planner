@@ -126,7 +126,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
               let msg = "AI error. Please try again.";
               try {
                 const inner = JSON.parse(raw);
-                if (inner?.error?.code === 429) msg = "Gemini rate limit reached — please wait a moment and try again.";
+                if (inner?.error?.code === 429) msg = "AI rate limit reached — please wait a moment and try again.";
                 else if (inner?.error?.message) msg = inner.error.message.slice(0, 120);
               } catch { /* raw wasn't JSON */ }
               setStreamingContent("");
