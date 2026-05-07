@@ -35,6 +35,34 @@ Do not mention you are an AI. Stay in the interviewer role throughout.`;
 export const OPENING_MESSAGE =
   "Let's develop your idea together. To start: what problem are you trying to solve with this project, and who runs into that problem?";
 
+export async function generateOpeningMessage(title: string, description?: string | null): Promise<string> {
+  const projectContext = description
+    ? `Title: ${title}\nDescription: ${description}`
+    : `Title: ${title}`;
+
+  const prompt = `You are about to interview a developer about their project idea. Write the opening message for the interview.
+
+Requirements:
+- Start with one sentence that interprets what this project is trying to do (don't just restate the title or description — show you've understood it)
+- Then ask exactly 2 focused questions
+- First question: dig into the core problem and who specifically has it
+- Second question: probe what they think will be the hardest part to get right (technical or product)
+- 3–4 sentences total, tight and direct
+- Tone: curious and peer-to-peer, like a product-minded engineer — not corporate or enthusiastic
+- No filler openers ("Great!", "Exciting!", "Sounds interesting!" etc.)
+- Do not mention being an AI
+
+Project:
+${projectContext}`;
+
+  const response = await ai.models.generateContent({
+    model: MODEL,
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+  });
+
+  return response.text?.trim() ?? OPENING_MESSAGE;
+}
+
 export function buildSummaryPrompt(transcript: string): string {
   return `Based on the following interview transcript, generate a structured JSON summary.
 Return ONLY valid JSON matching this exact shape, with no markdown, no code fences, no explanation:

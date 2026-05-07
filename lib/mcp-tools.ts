@@ -1,6 +1,7 @@
 import { createServerClient } from "./supabase/server";
 import { upsertTags } from "./db";
-import { generateSummary, sendInterviewMessage, OPENING_MESSAGE, buildSystemPrompt } from "./gemini";
+import { generateSummary, sendInterviewMessage, buildSystemPrompt } from "./gemini";
+import { generateOpeningMessage } from "./ai";
 import { ChatMessage, InterviewSummary, Tag } from "./types";
 
 export interface McpTool {
@@ -257,9 +258,20 @@ export async function callTool(name: string, args: ToolArgs) {
     case "start_interview": {
       const project_id = args.project_id as string;
 
+      const { data: project } = await supabase
+        .from("projects")
+        .select("title, description")
+        .eq("id", project_id)
+        .single();
+
+      const openingContent = await generateOpeningMessage(
+        project?.title ?? "Untitled project",
+        project?.description
+      );
+
       const firstMessage: ChatMessage = {
         role: "model",
-        content: OPENING_MESSAGE,
+        content: openingContent,
         ts: new Date().toISOString(),
       };
 
@@ -271,7 +283,7 @@ export async function callTool(name: string, args: ToolArgs) {
 
       if (error) return err(error.message);
 
-      return text({ session_id: session.id, first_message: OPENING_MESSAGE });
+      return text({ session_id: session.id, first_message: openingContent });
     }
 
     case "send_message": {

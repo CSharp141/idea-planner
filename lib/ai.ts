@@ -1,4 +1,5 @@
 import { ChatMessage } from "./types";
+import { OPENING_MESSAGE } from "./gemini";
 
 export { buildSystemPrompt } from "./gemini";
 
@@ -22,4 +23,17 @@ export async function generateSummary(messages: ChatMessage[]): Promise<string> 
   }
   const { generateSummary: fn } = await import("./gemini");
   return fn(messages);
+}
+
+export async function generateOpeningMessage(title: string, description?: string | null): Promise<string> {
+  try {
+    if (process.env.AI_PROVIDER === "groq") {
+      const { generateOpeningMessage: fn } = await import("./groq-ai");
+      return await fn(title, description);
+    }
+    const { generateOpeningMessage: fn } = await import("./gemini");
+    return await fn(title, description);
+  } catch {
+    return OPENING_MESSAGE;
+  }
 }
