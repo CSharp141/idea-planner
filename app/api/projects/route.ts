@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { upsertTags } from "@/lib/db";
 import { Tag } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
   const tag = req.nextUrl.searchParams.get("tag");
 
   let projectIds: string[] | null = null;
@@ -32,6 +35,7 @@ export async function GET(req: NextRequest) {
   let query = supabase
     .from("projects")
     .select("id, title, description, github_url, created_at, updated_at")
+    .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
   if (projectIds) query = query.in("id", projectIds);
@@ -39,14 +43,15 @@ export async function GET(req: NextRequest) {
   const { data: projects, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const { data: allPts } = await supabase
-    .from("project_tags")
-    .select("project_id, tags(id, name)");
+  const userProjectIds = (projects ?? []).map((p) => p.id);
 
-  const { data: sessions } = await supabase
-    .from("interview_sessions")
-    .select("project_id, summary")
-    .eq("status", "completed");
+  const { data: allPts } = userProjectIds.length
+    ? await supabase.from("project_tags").select("project_id, tags(id, name)").in("project_id", userProjectIds)
+    : { data: [] };
+
+  const { data: sessions } = userProjectIds.length
+    ? await supabase.from("interview_sessions").select("project_id, summary").eq("status", "completed").in("project_id", userProjectIds)
+    : { data: [] };
 
   const sessionMap = new Map<string, boolean>();
   (sessions ?? []).forEach((s: { project_id: string; summary: unknown }) => {
@@ -71,7 +76,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
   const body = await req.json();
   const { title, description, github_url, tags = [] } = body;
 
@@ -81,7 +89,7 @@ export async function POST(req: NextRequest) {
 
   const { data: project, error } = await supabase
     .from("projects")
-    .insert({ title: title.trim(), description, github_url })
+    .insert({ title: title.trim(), description, github_url, user_id: user.id })
     .select()
     .single();
 

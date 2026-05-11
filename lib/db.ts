@@ -1,7 +1,7 @@
-import { createServerClient } from "./supabase/server";
+import { createAdminClient } from "./supabase/server";
 
 export async function upsertTags(
-  supabase: ReturnType<typeof createServerClient>,
+  supabase: ReturnType<typeof createAdminClient>,
   projectId: string,
   tagNames: string[]
 ) {

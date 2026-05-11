@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { generateSummary } from "@/lib/ai";
 import { InterviewSummary } from "@/lib/types";
 
@@ -7,16 +7,24 @@ export async function POST(
   _req: NextRequest,
   { params }: { params: { sessionId: string } }
 ) {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
 
   const { data: session, error: fetchError } = await supabase
     .from("interview_sessions")
-    .select("messages")
+    .select("messages, project_id, projects(user_id)")
     .eq("id", params.sessionId)
     .single();
 
   if (fetchError || !session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
+  }
+
+  const project = (session.projects as unknown) as { user_id: string | null } | null;
+  if (!project || project.user_id !== user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   let summary: InterviewSummary;

@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { generateOpeningMessage } from "@/lib/ai";
 import { ChatMessage } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
   const { project_id } = await req.json();
 
   if (!project_id) {
@@ -15,11 +18,16 @@ export async function POST(req: NextRequest) {
     .from("projects")
     .select("title, description")
     .eq("id", project_id)
+    .eq("user_id", user.id)
     .single();
 
+  if (!project) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
+
   const openingContent = await generateOpeningMessage(
-    project?.title ?? "Untitled project",
-    project?.description
+    project.title ?? "Untitled project",
+    project.description
   );
 
   const firstMessage: ChatMessage = {

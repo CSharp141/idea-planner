@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { upsertTags } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -8,12 +8,16 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
 
   const { data: project, error } = await supabase
     .from("projects")
     .select("*")
     .eq("id", params.id)
+    .eq("user_id", user.id)
     .single();
 
   if (error || !project) {
@@ -46,7 +50,10 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
   const body = await req.json();
   const { tags, ...fields } = body;
 
@@ -60,22 +67,22 @@ export async function PATCH(
     const { error } = await supabase
       .from("projects")
       .update(updates)
-      .eq("id", params.id);
+      .eq("id", params.id)
+      .eq("user_id", user.id);
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   if (Array.isArray(tags)) {
-    // Remove all existing tags then re-upsert
     await supabase.from("project_tags").delete().eq("project_id", params.id);
     await upsertTags(supabase, params.id, tags);
   }
 
-  // Return full project
   const { data: project } = await supabase
     .from("projects")
     .select("*")
     .eq("id", params.id)
+    .eq("user_id", user.id)
     .single();
 
   const { data: pts } = await supabase
@@ -96,8 +103,16 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const supabase = createServerClient();
-  const { error } = await supabase.from("projects").delete().eq("id", params.id);
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", params.id)
+    .eq("user_id", user.id);
+
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return new NextResponse(null, { status: 204 });
 }

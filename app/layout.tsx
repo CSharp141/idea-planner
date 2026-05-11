@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { createAuthClient } from "@/lib/supabase/server";
+import { UserNav } from "@/components/ui/UserNav";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -15,7 +17,9 @@ export const metadata: Metadata = {
   description: "Capture and develop your project ideas",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { data: { user } } = await createAuthClient().auth.getUser();
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} antialiased min-h-screen bg-zinc-50 dark:bg-zinc-950`}>
@@ -25,13 +29,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-xl">💡</span>
               Idea Planner
             </Link>
-            <Link
-              href="/projects/new"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              New idea
-            </Link>
+            {user && (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/projects/new"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  New idea
+                </Link>
+                <UserNav email={user.email ?? ""} />
+              </div>
+            )}
           </div>
         </nav>
         <main className="mx-auto max-w-5xl px-4 py-8">

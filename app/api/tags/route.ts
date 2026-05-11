@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 
 export async function GET() {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("tags")
     .select("id, name")
@@ -13,7 +16,10 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createAdminClient();
   const { name } = await req.json();
 
   if (!name?.trim()) {

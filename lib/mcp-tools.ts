@@ -1,4 +1,4 @@
-import { createServerClient } from "./supabase/server";
+import { createAdminClient } from "./supabase/server";
 import { upsertTags } from "./db";
 import { generateSummary, sendInterviewMessage, buildSystemPrompt } from "./gemini";
 import { generateOpeningMessage } from "./ai";
@@ -115,7 +115,7 @@ function err(message: string): { isError: true; content: Array<{ type: "text"; t
 }
 
 export async function callTool(name: string, args: ToolArgs) {
-  const supabase = createServerClient();
+  const supabase = createAdminClient();
 
   switch (name) {
     case "list_projects": {

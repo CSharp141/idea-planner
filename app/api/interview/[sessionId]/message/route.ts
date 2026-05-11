@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { streamChatResponse, buildSystemPrompt } from "@/lib/ai";
 import { ChatMessage } from "@/lib/types";
 
@@ -10,12 +10,15 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { sessionId: string } }
 ) {
-  const supabase = createServerClient();
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+
+  const supabase = createAdminClient();
   const { content } = await req.json();
 
   const { data: session, error: fetchError } = await supabase
     .from("interview_sessions")
-    .select("messages, project_id, projects(title, description)")
+    .select("messages, project_id, projects(title, description, user_id)")
     .eq("id", params.sessionId)
     .single();
 
@@ -23,10 +26,13 @@ export async function POST(
     return new Response(JSON.stringify({ error: "Session not found" }), { status: 404 });
   }
 
-  const project = (session.projects as unknown) as { title: string; description: string | null } | null;
-  const systemPrompt = project
-    ? buildSystemPrompt(project.title, project.description)
-    : buildSystemPrompt("Untitled project");
+  const project = (session.projects as unknown) as { title: string; description: string | null; user_id: string | null } | null;
+
+  if (!project || project.user_id !== user.id) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  }
+
+  const systemPrompt = buildSystemPrompt(project.title, project.description);
 
   const userMsg: ChatMessage = {
     role: "user",

@@ -1,13 +1,14 @@
 import { Suspense } from "react";
-import { createServerClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { ProjectGrid } from "@/components/dashboard/ProjectGrid";
 import { TagFilterBar } from "@/components/dashboard/TagFilterBar";
 import { ProjectListItem, Tag } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-async function getProjects(tag?: string): Promise<ProjectListItem[]> {
-  const supabase = createServerClient();
+async function getProjects(userId: string, tag?: string): Promise<ProjectListItem[]> {
+  const supabase = createAdminClient();
 
   let projectIds: string[] | null = null;
 
@@ -32,6 +33,7 @@ async function getProjects(tag?: string): Promise<ProjectListItem[]> {
   let query = supabase
     .from("projects")
     .select("id, title, description, github_url, created_at, updated_at")
+    .eq("user_id", userId)
     .order("updated_at", { ascending: false });
 
   if (projectIds) query = query.in("id", projectIds);
@@ -39,14 +41,16 @@ async function getProjects(tag?: string): Promise<ProjectListItem[]> {
   const { data: projects } = await query;
   if (!projects) return [];
 
-  const { data: allPts } = await supabase
-    .from("project_tags")
-    .select("project_id, tags(id, name)");
+  const userProjectIds = projects.map((p) => p.id);
 
-  const { data: sessions } = await supabase
-    .from("interview_sessions")
-    .select("project_id, summary")
-    .eq("status", "completed");
+  const [{ data: allPts }, { data: sessions }] = await Promise.all([
+    userProjectIds.length
+      ? supabase.from("project_tags").select("project_id, tags(id, name)").in("project_id", userProjectIds)
+      : Promise.resolve({ data: [] }),
+    userProjectIds.length
+      ? supabase.from("interview_sessions").select("project_id, summary").eq("status", "completed").in("project_id", userProjectIds)
+      : Promise.resolve({ data: [] }),
+  ]);
 
   const sessionMap = new Map<string, boolean>();
   (sessions ?? []).forEach((s: { project_id: string; summary: unknown }) => {
@@ -69,7 +73,7 @@ async function getProjects(tag?: string): Promise<ProjectListItem[]> {
 }
 
 async function getTags(): Promise<Tag[]> {
-  const supabase = createServerClient();
+  const supabase = createAdminClient();
   const { data } = await supabase.from("tags").select("id, name").order("name");
   return data ?? [];
 }
@@ -79,8 +83,11 @@ export default async function DashboardPage({
 }: {
   searchParams: { tag?: string };
 }) {
+  const { data: { user } } = await createAuthClient().auth.getUser();
+  if (!user) redirect("/login");
+
   const [projects, tags] = await Promise.all([
-    getProjects(searchParams.tag),
+    getProjects(user.id, searchParams.tag),
     getTags(),
   ]);
 
