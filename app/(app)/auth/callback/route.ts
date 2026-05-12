@@ -4,7 +4,15 @@ import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const rawNext = searchParams.get("next") ?? "/";
+
+  // Validate the redirect target: must be a same-origin relative path.
+  // Reject anything that starts with "//" (protocol-relative) or contains ":",
+  // which would allow open-redirect to an external origin.
+  const next =
+    rawNext.startsWith("/") && !rawNext.startsWith("//") && !rawNext.includes(":")
+      ? rawNext
+      : "/";
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=auth`);

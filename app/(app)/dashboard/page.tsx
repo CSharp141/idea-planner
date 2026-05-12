@@ -84,7 +84,9 @@ export default async function DashboardPage({
 }: {
   searchParams: { tag?: string };
 }) {
-  const { data: { user } } = await createAuthClient().auth.getUser();
+  const {
+    data: { user },
+  } = await createAuthClient().auth.getUser();
   if (!user) redirect("/login");
 
   void track(user.id, "app_visited");
@@ -98,7 +100,9 @@ export default async function DashboardPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">My Ideas</h1>
-        <span className="text-sm text-zinc-500">{projects.length} project{projects.length !== 1 ? "s" : ""}</span>
+        <span className="text-sm text-zinc-500">
+          {projects.length} project{projects.length !== 1 ? "s" : ""}
+        </span>
       </div>
 
       <Suspense>
