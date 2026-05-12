@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { generateSummary } from "@/lib/ai";
-import { InterviewSummary } from "@/lib/types";
+import { ChatMessage, InterviewSummary } from "@/lib/types";
 import { track } from "@/lib/analytics";
 
 export async function POST(
@@ -28,9 +28,11 @@ export async function POST(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const messages = session.messages as ChatMessage[];
+
   let summary: InterviewSummary;
   try {
-    const raw = await generateSummary(session.messages);
+    const raw = await generateSummary(messages);
     summary = JSON.parse(raw) as InterviewSummary;
   } catch {
     return NextResponse.json({ error: "Failed to generate summary" }, { status: 500 });
@@ -46,7 +48,7 @@ export async function POST(
   await track(user.id, "interview_completed", {
     project_id: session.project_id,
     session_id: params.sessionId,
-    message_count: (session.messages as unknown[]).length,
+    message_count: messages.length,
   });
 
   return NextResponse.json({ summary });

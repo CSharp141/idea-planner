@@ -1,4 +1,5 @@
 -- Run this in the Supabase SQL editor
+-- Last updated: reflects multi-user auth migration and analytics_events table
 
 create extension if not exists "uuid-ossp";
 
@@ -7,6 +8,7 @@ create extension if not exists "uuid-ossp";
 -- ============================================================
 create table public.projects (
   id          uuid primary key default uuid_generate_v4(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
   title       text not null,
   description text,
   github_url  text,
@@ -63,6 +65,22 @@ create trigger sessions_updated_at
   for each row execute function public.set_updated_at();
 
 -- ============================================================
+-- ANALYTICS EVENTS
+-- Added via migration after initial schema creation.
+-- All writes go through the service role key (server-side only).
+-- ============================================================
+create table public.analytics_events (
+  id         uuid primary key default uuid_generate_v4(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  event_name text not null,
+  properties jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index analytics_events_user_id_idx on public.analytics_events(user_id);
+create index analytics_events_event_name_idx on public.analytics_events(event_name);
+
+-- ============================================================
 -- ROW LEVEL SECURITY
 -- All access goes through server-side service_role key
 -- ============================================================
@@ -70,8 +88,10 @@ alter table public.projects enable row level security;
 alter table public.tags enable row level security;
 alter table public.project_tags enable row level security;
 alter table public.interview_sessions enable row level security;
+alter table public.analytics_events enable row level security;
 
 create policy "service role full access" on public.projects using (true) with check (true);
 create policy "service role full access" on public.tags using (true) with check (true);
 create policy "service role full access" on public.project_tags using (true) with check (true);
 create policy "service role full access" on public.interview_sessions using (true) with check (true);
+create policy "service role full access" on public.analytics_events using (true) with check (true);

@@ -33,7 +33,8 @@ export async function generateOpeningMessage(title: string, description?: string
     }
     const { generateOpeningMessage: fn } = await import("./gemini");
     return await fn(title, description);
-  } catch {
+  } catch (err) {
+    console.error("[ai] generateOpeningMessage failed, using static fallback:", err);
     return OPENING_MESSAGE;
   }
 }

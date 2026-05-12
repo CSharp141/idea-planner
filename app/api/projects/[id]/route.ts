@@ -60,7 +60,19 @@ export async function PATCH(
   const updates: Record<string, unknown> = {};
   if (fields.title !== undefined) updates.title = fields.title.trim();
   if (fields.description !== undefined) updates.description = fields.description;
-  if (fields.github_url !== undefined) updates.github_url = fields.github_url;
+  if (fields.github_url !== undefined) {
+    if (fields.github_url != null && fields.github_url !== "") {
+      try {
+        const parsed = new URL(fields.github_url);
+        if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+          return NextResponse.json({ error: "github_url must be a valid URL" }, { status: 400 });
+        }
+      } catch {
+        return NextResponse.json({ error: "github_url must be a valid URL" }, { status: 400 });
+      }
+    }
+    updates.github_url = fields.github_url || null;
+  }
   if (fields.notes !== undefined) updates.notes = fields.notes;
 
   if (Object.keys(updates).length > 0) {

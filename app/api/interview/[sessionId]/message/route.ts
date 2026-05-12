@@ -14,7 +14,15 @@ export async function POST(
   if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 
   const supabase = createAdminClient();
-  const { content } = await req.json();
+  const body = await req.json();
+  const { content } = body;
+
+  if (typeof content !== "string" || content.trim().length === 0) {
+    return new Response(JSON.stringify({ error: "content is required" }), { status: 400 });
+  }
+  if (content.length > 4000) {
+    return new Response(JSON.stringify({ error: "content exceeds maximum length of 4000 characters" }), { status: 400 });
+  }
 
   const { data: session, error: fetchError } = await supabase
     .from("interview_sessions")
@@ -36,7 +44,7 @@ export async function POST(
 
   const userMsg: ChatMessage = {
     role: "user",
-    content,
+    content: content.trim(),
     ts: new Date().toISOString(),
   };
   const messagesWithUser: ChatMessage[] = [...session.messages, userMsg];

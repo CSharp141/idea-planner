@@ -26,6 +26,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
   }
 
+  // Return the existing active session rather than spawning a new AI call each time
+  const { data: existingSession } = await supabase
+    .from("interview_sessions")
+    .select("id, messages")
+    .eq("project_id", project_id)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (existingSession) {
+    const messages = existingSession.messages as ChatMessage[];
+    const firstModelMsg = messages.find((m) => m.role === "model");
+    return NextResponse.json(
+      { session_id: existingSession.id, first_message: firstModelMsg?.content ?? "" },
+      { status: 200 }
+    );
+  }
+
   const openingContent = await generateOpeningMessage(
     project.title ?? "Untitled project",
     project.description

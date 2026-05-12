@@ -88,9 +88,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }
 
+  if (github_url != null && github_url !== "") {
+    try {
+      const parsed = new URL(github_url);
+      if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+        return NextResponse.json({ error: "github_url must be a valid URL" }, { status: 400 });
+      }
+    } catch {
+      return NextResponse.json({ error: "github_url must be a valid URL" }, { status: 400 });
+    }
+  }
+
   const { data: project, error } = await supabase
     .from("projects")
-    .insert({ title: title.trim(), description, github_url, user_id: user.id })
+    .insert({ title: title.trim(), description, github_url: github_url || null, user_id: user.id })
     .select()
     .single();
 
