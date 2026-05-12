@@ -16,7 +16,7 @@ export function ProjectCard({ project }: { project: ProjectListItem }) {
         </h2>
         <div className="flex shrink-0 items-center gap-1.5">
           {project.has_summary && (
-            <Sparkles className="h-4 w-4 text-amber-500" aria-label="Has AI summary" />
+            <Sparkles className="h-4 w-4 text-amber-500" role="img" aria-label="Has AI summary" />
           )}
           {project.github_url && (
             <a

@@ -16,15 +16,18 @@ export function TagFilterBar({ tags }: { tags: Tag[] }) {
     } else {
       params.delete("tag");
     }
-    router.push(`/?${params.toString()}`);
+    // Use replace so tag filtering doesn't pollute the browser history stack.
+    router.replace(`/?${params.toString()}`);
   }
 
   if (tags.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by tag">
       <button
+        type="button"
         onClick={() => select(null)}
+        aria-pressed={!active}
         className={cn(
           "rounded-full border px-3 py-1 text-sm transition-colors",
           !active
@@ -37,7 +40,9 @@ export function TagFilterBar({ tags }: { tags: Tag[] }) {
       {tags.map((tag) => (
         <button
           key={tag.id}
+          type="button"
           onClick={() => select(tag.name)}
+          aria-pressed={active === tag.name}
           className={cn(
             "rounded-full border px-3 py-1 text-sm transition-colors",
             active === tag.name

@@ -14,22 +14,29 @@ export function NotesSection({ projectId, initialNotes }: NotesSectionProps) {
   const [notes, setNotes] = useState(initialNotes ?? "");
   const [draft, setDraft] = useState(notes);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   async function save() {
     setSaving(true);
-    await fetch(`/api/projects/${projectId}`, {
+    setSaveError(false);
+    const res = await fetch(`/api/projects/${projectId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ notes: draft }),
     });
-    setNotes(draft);
     setSaving(false);
+    if (!res.ok) {
+      setSaveError(true);
+      return;
+    }
+    setNotes(draft);
     setEditing(false);
   }
 
   function cancel() {
     setDraft(notes);
     setEditing(false);
+    setSaveError(false);
   }
 
   return (
@@ -42,7 +49,7 @@ export function NotesSection({ projectId, initialNotes }: NotesSectionProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => { setDraft(notes); setEditing(true); }}
+            onClick={() => { setDraft(notes); setEditing(true); setSaveError(false); }}
           >
             <Pencil className="h-3.5 w-3.5" />
             Edit
@@ -60,12 +67,15 @@ export function NotesSection({ projectId, initialNotes }: NotesSectionProps) {
             className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 resize-none"
             placeholder="Add your notes here…"
           />
+          {saveError && (
+            <p className="text-sm text-red-500">Failed to save notes. Please try again.</p>
+          )}
           <div className="flex gap-2">
             <Button size="sm" onClick={save} disabled={saving}>
               <Check className="h-3.5 w-3.5" />
               {saving ? "Saving…" : "Save"}
             </Button>
-            <Button size="sm" variant="ghost" onClick={cancel}>
+            <Button size="sm" variant="ghost" onClick={cancel} disabled={saving}>
               <X className="h-3.5 w-3.5" />
               Cancel
             </Button>

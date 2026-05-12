@@ -14,12 +14,25 @@ export default function EditProjectPage() {
     github_url: string;
     tags: { name: string }[];
   } | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetch(`/api/projects/${params.id}`)
-      .then((r) => r.json())
-      .then(setProject);
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load project");
+        return r.json();
+      })
+      .then(setProject)
+      .catch(() => setError(true));
   }, [params.id]);
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-xl py-24 text-center">
+        <p className="text-sm text-red-500">Failed to load project. Please go back and try again.</p>
+      </div>
+    );
+  }
 
   if (!project) {
     return (

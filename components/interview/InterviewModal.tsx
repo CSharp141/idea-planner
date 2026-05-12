@@ -25,6 +25,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
   const [streamingContent, setStreamingContent] = useState("");
   const [input, setInput] = useState("");
   const [confirmFinish, setConfirmFinish] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -54,14 +55,29 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
       });
   }, [open, projectId, sessionId]);
 
-  // Reset on close
-  function handleClose() {
+  // Determine whether the user has made meaningful progress that would be lost.
+  // We count user messages (not the initial AI prompt).
+  const userMessageCount = messages.filter((m) => m.role === "user").length;
+  const hasProgress = userMessageCount > 0;
+
+  function requestClose() {
+    // If the interview is done (summary generated) or there's no user progress yet,
+    // close immediately without prompting.
+    if (status === "done" || status === "summarising" || !hasProgress) {
+      doClose();
+      return;
+    }
+    setConfirmClose(true);
+  }
+
+  function doClose() {
     setSessionId(null);
     setMessages([]);
     setStreamingContent("");
     setInput("");
     setStatus("idle");
     setConfirmFinish(false);
+    setConfirmClose(false);
     setStreamError(null);
     onClose();
   }
@@ -163,7 +179,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
     if (res.ok) {
       setStatus("done");
       setTimeout(() => {
-        handleClose();
+        doClose();
         router.refresh();
       }, 1500);
     } else {
@@ -184,7 +200,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
   }
 
   return (
-    <Modal open={open} onClose={handleClose} className="max-w-2xl">
+    <Modal open={open} onClose={requestClose} className="max-w-2xl">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-700">
         <div>
@@ -193,7 +209,12 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
             Answer freely — I&apos;ll help you develop your idea
           </p>
         </div>
-        <button onClick={handleClose} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+        <button
+          type="button"
+          onClick={requestClose}
+          aria-label="Close interview"
+          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+        >
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -244,10 +265,24 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
+      {/* Input / confirmation panels */}
       {status !== "summarising" && status !== "done" && (
         <div className="border-t border-zinc-200 p-4 dark:border-zinc-700">
-          {confirmFinish ? (
+          {confirmClose ? (
+            <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 dark:bg-amber-950/30 dark:border-amber-800">
+              <p className="mb-3 text-sm text-amber-800 dark:text-amber-200">
+                Close the interview? Your conversation won&apos;t be summarised and progress will be lost.
+              </p>
+              <div className="flex gap-2">
+                <Button size="sm" variant="danger" onClick={doClose}>
+                  Yes, close
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setConfirmClose(false)}>
+                  Keep chatting
+                </Button>
+              </div>
+            </div>
+          ) : confirmFinish ? (
             <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 dark:bg-amber-950/30 dark:border-amber-800">
               <p className="mb-3 text-sm text-amber-800 dark:text-amber-200">
                 Generate a summary from this conversation?
