@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { upsertTags } from "@/lib/db";
 import { Tag } from "@/lib/types";
+import { track } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +99,8 @@ export async function POST(req: NextRequest) {
   if (tags.length > 0) {
     await upsertTags(supabase, project.id, tags);
   }
+
+  await track(user.id, "project_created", { project_id: project.id });
 
   return NextResponse.json(project, { status: 201 });
 }

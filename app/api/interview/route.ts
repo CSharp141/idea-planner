@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { generateOpeningMessage } from "@/lib/ai";
 import { ChatMessage } from "@/lib/types";
+import { track } from "@/lib/analytics";
 
 export async function POST(req: NextRequest) {
   const { data: { user } } = await createAuthClient().auth.getUser();
@@ -47,6 +48,8 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  await track(user.id, "interview_started", { project_id, session_id: session.id });
 
   return NextResponse.json(
     { session_id: session.id, first_message: openingContent },

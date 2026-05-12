@@ -25,8 +25,19 @@ export default function ProjectDetailPage() {
   async function load() {
     const res = await fetch(`/api/projects/${params.id}`);
     if (!res.ok) { router.push("/"); return; }
-    setProject(await res.json());
+    const data: Project = await res.json();
+    setProject(data);
     setLoading(false);
+    if (data.latest_session?.summary) {
+      void fetch("/api/analytics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "summary_viewed",
+          properties: { project_id: data.id, session_id: data.latest_session.id },
+        }),
+      });
+    }
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

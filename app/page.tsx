@@ -4,6 +4,7 @@ import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { ProjectGrid } from "@/components/dashboard/ProjectGrid";
 import { TagFilterBar } from "@/components/dashboard/TagFilterBar";
 import { ProjectListItem, Tag } from "@/lib/types";
+import { track } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -85,6 +86,8 @@ export default async function DashboardPage({
 }) {
   const { data: { user } } = await createAuthClient().auth.getUser();
   if (!user) redirect("/login");
+
+  void track(user.id, "app_visited");
 
   const [projects, tags] = await Promise.all([
     getProjects(user.id, searchParams.tag),

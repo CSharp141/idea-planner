@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAuthClient, createAdminClient } from "@/lib/supabase/server";
 import { generateSummary } from "@/lib/ai";
 import { InterviewSummary } from "@/lib/types";
+import { track } from "@/lib/analytics";
 
 export async function POST(
   _req: NextRequest,
@@ -41,6 +42,12 @@ export async function POST(
     .eq("id", params.sessionId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  await track(user.id, "interview_completed", {
+    project_id: session.project_id,
+    session_id: params.sessionId,
+    message_count: (session.messages as unknown[]).length,
+  });
 
   return NextResponse.json({ summary });
 }
