@@ -61,16 +61,12 @@ export function FooterCta({ stars }: FooterCtaProps) {
           <p className="text-sm text-gray-600">© 2026 Idea Planner. All rights reserved.</p>
           <nav aria-label="Footer links" className="flex items-center gap-6">
             <a
-              href="/privacy"
+              href="https://github.com/CSharp141/idea-planner"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm text-gray-600 hover:text-gray-400 transition-colors"
             >
-              Privacy
-            </a>
-            <a
-              href="/terms"
-              className="text-sm text-gray-600 hover:text-gray-400 transition-colors"
-            >
-              Terms
+              GitHub
             </a>
           </nav>
         </div>

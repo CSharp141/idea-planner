@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <nav className="sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <Link
-            href="/"
+            href="/dashboard"
             className="flex items-center gap-2 font-semibold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
             <span className="text-xl">💡</span>

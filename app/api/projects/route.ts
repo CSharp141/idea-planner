@@ -93,7 +93,10 @@ export async function POST(req: NextRequest) {
   if (description != null && (typeof description !== "string" || description.length > 2000)) {
     return NextResponse.json({ error: "Description must be 2000 characters or fewer" }, { status: 400 });
   }
-  if (!Array.isArray(tags) || tags.length > 20) {
+  if (!Array.isArray(tags)) {
+    return NextResponse.json({ error: "Tags must be an array" }, { status: 400 });
+  }
+  if (tags.length > 20) {
     return NextResponse.json({ error: "A project may have at most 20 tags" }, { status: 400 });
   }
   for (const tag of tags) {

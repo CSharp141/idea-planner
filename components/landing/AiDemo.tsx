@@ -35,7 +35,9 @@ export function AiDemo() {
         setCurrentIndex((i) => (i + 1) % QA_PAIRS.length);
         setDisplayedAnswer("");
       }, 3000);
-      return;
+      return () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      };
     }
 
     setDisplayedAnswer("");
