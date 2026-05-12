@@ -43,7 +43,7 @@ export async function POST(
     .update({ summary, status: "completed" })
     .eq("id", params.sessionId);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Failed to save summary" }, { status: 500 });
 
   await track(user.id, "interview_completed", {
     project_id: session.project_id,

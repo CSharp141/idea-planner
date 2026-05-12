@@ -57,6 +57,36 @@ export async function PATCH(
   const body = await req.json();
   const { tags, ...fields } = body;
 
+  // Validate fields that are being updated
+  if (fields.title !== undefined) {
+    if (typeof fields.title !== "string" || !fields.title.trim()) {
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    }
+    if (fields.title.trim().length > 200) {
+      return NextResponse.json({ error: "Title must be 200 characters or fewer" }, { status: 400 });
+    }
+  }
+  if (fields.description !== undefined && fields.description != null) {
+    if (typeof fields.description !== "string" || fields.description.length > 2000) {
+      return NextResponse.json({ error: "Description must be 2000 characters or fewer" }, { status: 400 });
+    }
+  }
+  if (fields.notes !== undefined && fields.notes != null) {
+    if (typeof fields.notes !== "string" || fields.notes.length > 50000) {
+      return NextResponse.json({ error: "Notes must be 50000 characters or fewer" }, { status: 400 });
+    }
+  }
+  if (tags !== undefined && Array.isArray(tags)) {
+    if (tags.length > 20) {
+      return NextResponse.json({ error: "A project may have at most 20 tags" }, { status: 400 });
+    }
+    for (const tag of tags) {
+      if (typeof tag !== "string" || tag.trim().length === 0 || tag.trim().length > 50) {
+        return NextResponse.json({ error: "Each tag must be between 1 and 50 characters" }, { status: 400 });
+      }
+    }
+  }
+
   const updates: Record<string, unknown> = {};
   if (fields.title !== undefined) updates.title = fields.title.trim();
   if (fields.description !== undefined) updates.description = fields.description;
@@ -82,7 +112,7 @@ export async function PATCH(
       .eq("id", params.id)
       .eq("user_id", user.id);
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
   }
 
   if (Array.isArray(tags)) {
@@ -125,6 +155,6 @@ export async function DELETE(
     .eq("id", params.id)
     .eq("user_id", user.id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
   return new NextResponse(null, { status: 204 });
 }

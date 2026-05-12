@@ -1,0 +1,86 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
+import { heroFadeIn } from "./motion/motionTokens";
+
+const HeroCanvas = dynamic(() => import("./HeroCanvas"), { ssr: false });
+
+export function Hero() {
+  const reducedMotion = useReducedMotion() ?? false;
+
+  return (
+    <section
+      aria-label="Hero"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-950"
+    >
+      {/* 3D canvas background */}
+      <HeroCanvas />
+
+      {/* Bottom gradient blending the canvas into the next section */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-b from-transparent via-transparent to-gray-950"
+        aria-hidden="true"
+      />
+
+      {/* Text overlay */}
+      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center gap-6">
+        {/* Badge */}
+        <motion.span
+          {...heroFadeIn(reducedMotion, 0)}
+          className="inline-flex items-center gap-1.5 bg-indigo-950/60 border border-indigo-500/30 text-indigo-300 text-xs font-medium px-3 py-1 rounded-full"
+        >
+          Now in Beta
+        </motion.span>
+
+        {/* H1 */}
+        <motion.h1
+          {...heroFadeIn(reducedMotion, 1)}
+          className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-none text-white text-balance"
+        >
+          Capture and develop your side-project ideas.
+        </motion.h1>
+
+        {/* Sub-headline */}
+        <motion.p
+          {...heroFadeIn(reducedMotion, 2)}
+          className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed"
+        >
+          A focused workspace for developers who want to think their ideas through before they build.
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          {...heroFadeIn(reducedMotion, 3)}
+          className="flex flex-col sm:flex-row items-center gap-4"
+        >
+          <Link
+            href="/login"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl text-base transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+          >
+            Start for Free
+          </Link>
+          <a
+            href="https://github.com/CSharp141/idea-planner"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-white/20 hover:border-white/40 text-white font-semibold px-8 py-4 rounded-xl text-base transition-colors bg-transparent focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+          >
+            View on GitHub
+          </a>
+        </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          {...heroFadeIn(reducedMotion, 4)}
+          className="flex flex-col items-center gap-1 text-gray-600"
+        >
+          <span className="text-xs">See how</span>
+          <ChevronDown className="animate-bounce w-5 h-5" aria-hidden="true" />
+        </motion.div>
+      </div>
+    </section>
+  );
+}

@@ -37,8 +37,9 @@ export const TOOLS: McpTool[] = [
         description: { type: "string" },
         github_url: { type: "string" },
         tags: { type: "array", items: { type: "string" } },
+        user_id: { type: "string", description: "UUID of the owning user (required)" },
       },
-      required: ["title"],
+      required: ["title", "user_id"],
     },
   },
   {
@@ -200,14 +201,35 @@ export async function callTool(name: string, args: ToolArgs) {
       };
 
       if (!title?.trim()) return err("title is required");
+      if (title.trim().length > 200) return err("title must be 200 characters or fewer");
+      if (description != null && description.length > 2000) return err("description must be 2000 characters or fewer");
+
+      if (github_url != null && github_url !== "") {
+        try {
+          const parsed = new URL(github_url);
+          if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+            return err("github_url must be a valid http/https URL");
+          }
+        } catch {
+          return err("github_url must be a valid URL");
+        }
+      }
+
+      // MCP is a machine-to-machine interface secured by MCP_SECRET.
+      // We must still supply a user_id (required NOT NULL) — look up the owner
+      // of the first project or fall back to requiring a user_id argument.
+      const user_id = (args.user_id as string | undefined) ?? null;
+      if (!user_id) {
+        return err("user_id is required when creating a project via MCP");
+      }
 
       const { data: project, error } = await supabase
         .from("projects")
-        .insert({ title: title.trim(), description, github_url })
+        .insert({ title: title.trim(), description, github_url: github_url || null, user_id })
         .select()
         .single();
 
-      if (error) return err(error.message);
+      if (error) return err("Failed to create project");
 
       if (tags && tags.length > 0) {
         await upsertTags(supabase, project.id, tags);
@@ -226,10 +248,30 @@ export async function callTool(name: string, args: ToolArgs) {
         tags?: string[];
       };
 
+      if (fields.title !== undefined && fields.title.trim().length > 200) {
+        return err("title must be 200 characters or fewer");
+      }
+      if (fields.description != null && fields.description.length > 2000) {
+        return err("description must be 2000 characters or fewer");
+      }
+      if (fields.notes != null && fields.notes.length > 50000) {
+        return err("notes must be 50000 characters or fewer");
+      }
+      if (fields.github_url != null && fields.github_url !== "") {
+        try {
+          const parsed = new URL(fields.github_url);
+          if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+            return err("github_url must be a valid http/https URL");
+          }
+        } catch {
+          return err("github_url must be a valid URL");
+        }
+      }
+
       const updates: Record<string, unknown> = {};
       if (fields.title !== undefined) updates.title = fields.title.trim();
       if (fields.description !== undefined) updates.description = fields.description;
-      if (fields.github_url !== undefined) updates.github_url = fields.github_url;
+      if (fields.github_url !== undefined) updates.github_url = fields.github_url || null;
       if (fields.notes !== undefined) updates.notes = fields.notes;
 
       if (Object.keys(updates).length > 0) {
@@ -238,7 +280,7 @@ export async function callTool(name: string, args: ToolArgs) {
           .update(updates)
           .eq("id", project_id);
 
-        if (error) return err(error.message);
+        if (error) return err("Failed to update project");
       }
 
       if (Array.isArray(tags)) {
@@ -288,6 +330,13 @@ export async function callTool(name: string, args: ToolArgs) {
 
     case "send_message": {
       const { session_id, message } = args as { session_id: string; message: string };
+
+      if (typeof message !== "string" || message.trim().length === 0) {
+        return err("message is required");
+      }
+      if (message.length > 4000) {
+        return err("message exceeds maximum length of 4000 characters");
+      }
 
       const { data: session, error: fetchError } = await supabase
         .from("interview_sessions")

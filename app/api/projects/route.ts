@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   if (projectIds) query = query.in("id", projectIds);
 
   const { data: projects, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
 
   const userProjectIds = (projects ?? []).map((p) => p.id);
 
@@ -87,6 +87,23 @@ export async function POST(req: NextRequest) {
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }
+  if (typeof title !== "string" || title.trim().length > 200) {
+    return NextResponse.json({ error: "Title must be 200 characters or fewer" }, { status: 400 });
+  }
+  if (description != null && (typeof description !== "string" || description.length > 2000)) {
+    return NextResponse.json({ error: "Description must be 2000 characters or fewer" }, { status: 400 });
+  }
+  if (!Array.isArray(tags)) {
+    return NextResponse.json({ error: "Tags must be an array" }, { status: 400 });
+  }
+  if (tags.length > 20) {
+    return NextResponse.json({ error: "A project may have at most 20 tags" }, { status: 400 });
+  }
+  for (const tag of tags) {
+    if (typeof tag !== "string" || tag.trim().length === 0 || tag.trim().length > 50) {
+      return NextResponse.json({ error: "Each tag must be between 1 and 50 characters" }, { status: 400 });
+    }
+  }
 
   if (github_url != null && github_url !== "") {
     try {
@@ -105,7 +122,7 @@ export async function POST(req: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
 
   if (tags.length > 0) {
     await upsertTags(supabase, project.id, tags);
