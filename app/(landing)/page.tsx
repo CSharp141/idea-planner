@@ -9,9 +9,9 @@ import { SocialProof } from "@/components/landing/SocialProof";
 import { FooterCta } from "@/components/landing/FooterCta";
 
 export const metadata: Metadata = {
-  title: "Idea Planner — Develop side-project ideas with AI",
+  title: "Preflight — Don't build without it.",
   description:
-    "Capture, organise, and develop your side project ideas with AI interviews and structured notes. Free to start. Built for developers and indie hackers.",
+    "Run an AI preflight check on your side-project idea before you write a line of code. Structured questions, honest answers, saved summary. Free for developers and indie hackers.",
 };
 
 async function getGitHubStars(): Promise<number> {

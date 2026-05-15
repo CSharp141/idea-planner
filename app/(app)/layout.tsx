@@ -16,8 +16,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             href="/dashboard"
             className="flex items-center gap-2 font-semibold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
-            <span className="text-xl">💡</span>
-            Idea Planner
+            <span className="text-xl">✈️</span>
+            Preflight
           </Link>
           {user && (
             <div className="flex items-center gap-3">

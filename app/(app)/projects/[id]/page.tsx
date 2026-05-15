@@ -55,14 +55,14 @@ export default function ProjectDetailPage() {
     }
 
     // Update browser tab title to reflect the project name.
-    document.title = `${data.title} — Idea Planner`;
+    document.title = `${data.title} — Preflight`;
   }, [params.id, router]);
 
   useEffect(() => {
     load();
     return () => {
       // Reset title when leaving the page.
-      document.title = "Idea Planner";
+      document.title = "Preflight";
     };
   }, [load]);
 

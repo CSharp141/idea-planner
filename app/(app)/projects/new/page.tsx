@@ -1,6 +1,6 @@
 import { ProjectForm } from "@/components/forms/ProjectForm";
 
-export const metadata = { title: "New Idea — Idea Planner" };
+export const metadata = { title: "New Idea — Preflight" };
 
 export default function NewProjectPage() {
   return (

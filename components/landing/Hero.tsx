@@ -40,7 +40,7 @@ export function Hero() {
           {...heroFadeIn(reducedMotion, 1)}
           className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-none text-white text-balance"
         >
-          Capture and develop your side-project ideas.
+          Most developers build before they think. Preflight fixes that.
         </motion.h1>
 
         {/* Sub-headline */}
@@ -48,7 +48,7 @@ export function Hero() {
           {...heroFadeIn(reducedMotion, 2)}
           className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed"
         >
-          A focused workspace for developers who want to think their ideas through before they build.
+          Answer a structured set of AI-led questions about your idea — who it&apos;s for, what problem it solves, and where it could fail — before you write a line of code. For developers and indie hackers who want to ship the right thing.
         </motion.p>
 
         {/* CTAs */}
@@ -60,7 +60,7 @@ export function Hero() {
             href="/login"
             className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl text-base transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
           >
-            Start for Free
+            Run Your First Preflight
           </Link>
           <a
             href="https://github.com/CSharp141/idea-planner"

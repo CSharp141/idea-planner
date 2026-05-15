@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Lightbulb } from "lucide-react";
+import { Menu, X, Plane } from "lucide-react";
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -28,8 +28,8 @@ export function Nav() {
       <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 text-white font-semibold text-lg">
-          <Lightbulb className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-          Idea Planner
+          <Plane className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          Preflight
         </Link>
 
         {/* Desktop nav */}

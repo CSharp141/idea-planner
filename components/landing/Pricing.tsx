@@ -32,8 +32,8 @@ const TEAM_FEATURES = [
   "Admin dashboard",
 ];
 
-const PRO_EMAIL = "mailto:callum.j.sharp02@gmail.com?subject=Idea Planner Pro Interest";
-const TEAM_EMAIL = "mailto:callum.j.sharp02@gmail.com?subject=Idea Planner Team Interest";
+const PRO_EMAIL = "mailto:callum.j.sharp02@gmail.com?subject=Preflight Pro Interest";
+const TEAM_EMAIL = "mailto:callum.j.sharp02@gmail.com?subject=Preflight Team Interest";
 
 function FeatureList({ features }: { features: string[] }) {
   return (

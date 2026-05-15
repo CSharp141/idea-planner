@@ -59,7 +59,7 @@ export function Features() {
           id="features-heading"
           className="text-3xl md:text-4xl font-bold text-white mb-20"
         >
-          Built for the way developers think
+          Everything you should ask before you start building.
         </h2>
 
         <div className="flex flex-col gap-24 md:gap-32">
