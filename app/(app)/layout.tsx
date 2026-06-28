@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { createAuthClient } from "@/lib/supabase/server";
 import { UserNav } from "@/components/ui/UserNav";
+import { Logo } from "@/components/ui/Logo";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const {
@@ -9,21 +10,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } = await createAuthClient().auth.getUser();
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <nav className="sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
+    <div className="min-h-screen bg-ink-50 dark:bg-ink-950">
+      <nav className="sticky top-0 z-40 border-b border-ink-200 bg-white/80 backdrop-blur dark:border-ink-800 dark:bg-ink-950/80">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 font-semibold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-          >
-            <span className="text-xl">✈️</span>
-            Preflight
-          </Link>
+          <Logo href="/dashboard" wordmarkClassName="text-ink-900 dark:text-ink-100" />
           {user && (
             <div className="flex items-center gap-3">
               <Link
                 href="/projects/new"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-signal-500 px-3 py-1.5 text-sm font-medium text-ink-950 hover:bg-signal-600 transition-colors"
               >
                 <Plus className="h-4 w-4" />
                 New idea

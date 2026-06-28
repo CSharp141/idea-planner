@@ -4,12 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { Input } from "@/components/ui/Input";
+import { Logo } from "@/components/ui/Logo";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
 type Mode = "signin" | "signup" | "magic";
-
-const inputClass =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -74,12 +73,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm p-8">
-        <div className="mb-6 text-center">
-          <div className="text-3xl mb-2">✈️</div>
-          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Preflight</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Sign in to your ideas</p>
+    <div className="min-h-screen bg-ink-50 dark:bg-ink-950 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white dark:bg-ink-900 rounded-xl border border-ink-200 dark:border-ink-800 shadow-sm p-8">
+        <div className="mb-6 flex flex-col items-center text-center">
+          <Logo href={null} showWordmark={false} className="mb-3" />
+          <h1 className="font-display text-xl font-semibold text-ink-900 dark:text-ink-100">Preflight</h1>
+          <p className="text-sm text-ink-500 dark:text-ink-400 mt-1">Sign in to your ideas</p>
         </div>
 
         {/* OAuth buttons */}
@@ -98,29 +97,27 @@ export default function LoginPage() {
         </div>
 
         <div className="my-5 flex items-center gap-3">
-          <div className="flex-1 border-t border-zinc-200 dark:border-zinc-700" />
-          <span className="text-xs text-zinc-400">or</span>
-          <div className="flex-1 border-t border-zinc-200 dark:border-zinc-700" />
+          <div className="flex-1 border-t border-ink-200 dark:border-ink-700" />
+          <span className="text-xs text-ink-400">or</span>
+          <div className="flex-1 border-t border-ink-200 dark:border-ink-700" />
         </div>
 
         {/* Email form */}
         <form onSubmit={handleEmailSubmit} className="space-y-3">
-          <input
+          <Input
             type="email"
             placeholder="Email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={inputClass}
           />
           {mode !== "magic" && (
-            <input
+            <Input
               type="password"
               placeholder="Password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={inputClass}
             />
           )}
 
@@ -133,24 +130,24 @@ export default function LoginPage() {
         </form>
 
         {/* Mode switchers */}
-        <div className="mt-4 flex flex-col gap-1.5 text-center text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="mt-4 flex flex-col gap-1.5 text-center text-xs text-ink-500 dark:text-ink-400">
           {mode === "signin" && (
             <>
-              <button type="button" className="hover:text-indigo-600" onClick={() => { setMode("signup"); setError(null); setInfo(null); }}>
+              <button type="button" className="hover:text-signal-500" onClick={() => { setMode("signup"); setError(null); setInfo(null); }}>
                 No account? Create one
               </button>
-              <button type="button" className="hover:text-indigo-600" onClick={() => { setMode("magic"); setError(null); setInfo(null); }}>
+              <button type="button" className="hover:text-signal-500" onClick={() => { setMode("magic"); setError(null); setInfo(null); }}>
                 Sign in with magic link instead
               </button>
             </>
           )}
           {mode === "signup" && (
-            <button type="button" className="hover:text-indigo-600" onClick={() => { setMode("signin"); setError(null); setInfo(null); }}>
+            <button type="button" className="hover:text-signal-500" onClick={() => { setMode("signin"); setError(null); setInfo(null); }}>
               Already have an account? Sign in
             </button>
           )}
           {mode === "magic" && (
-            <button type="button" className="hover:text-indigo-600" onClick={() => { setMode("signin"); setError(null); setInfo(null); }}>
+            <button type="button" className="hover:text-signal-500" onClick={() => { setMode("signin"); setError(null); setInfo(null); }}>
               Use password instead
             </button>
           )}

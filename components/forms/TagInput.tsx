@@ -57,7 +57,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
 
   return (
     <div
-      className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 cursor-text"
+      className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg border border-ink-300 bg-white px-3 py-2 focus-within:border-signal-400 focus-within:ring-1 focus-within:ring-signal-400 dark:border-ink-600 dark:bg-ink-800 cursor-text"
       onClick={() => inputRef.current?.focus()}
     >
       {value.map((tag) => (
@@ -75,16 +75,16 @@ export function TagInput({ value, onChange }: TagInputProps) {
           onKeyDown={handleKeyDown}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
           placeholder={value.length === 0 ? "Add tags…" : ""}
-          className="w-full bg-transparent text-sm outline-none placeholder:text-zinc-400"
+          className="w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
         />
         {showSuggestions && suggestions.length > 0 && (
-          <ul className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+          <ul className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border border-ink-200 bg-white py-1 shadow-lg dark:border-ink-700 dark:bg-ink-900">
             {suggestions.map((s) => (
               <li key={s.id}>
                 <button
                   type="button"
                   onMouseDown={() => addTag(s.name)}
-                  className="w-full px-3 py-1.5 text-left text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  className="w-full px-3 py-1.5 text-left text-sm text-ink-700 hover:bg-ink-50 dark:text-ink-300 dark:hover:bg-ink-800"
                 >
                   #{s.name}
                 </button>

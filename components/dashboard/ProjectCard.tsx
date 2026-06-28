@@ -8,10 +8,10 @@ export function ProjectCard({ project }: { project: ProjectListItem }) {
   return (
     <Link
       href={`/projects/${project.id}`}
-      className="group flex flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:border-indigo-300 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-indigo-500"
+      className="group flex flex-col rounded-xl border border-ink-200 bg-white p-5 shadow-sm transition-all hover:border-signal-300 hover:shadow-md dark:border-ink-700 dark:bg-ink-800 dark:hover:border-signal-400"
     >
       <div className="mb-2 flex items-start justify-between gap-2">
-        <h2 className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400 line-clamp-2">
+        <h2 className="text-base font-semibold text-ink-900 group-hover:text-signal-500 dark:text-ink-100 dark:group-hover:text-signal-400 line-clamp-2">
           {project.title}
         </h2>
         <div className="flex shrink-0 items-center gap-1.5">
@@ -24,7 +24,7 @@ export function ProjectCard({ project }: { project: ProjectListItem }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+              className="text-ink-400 hover:text-ink-700 dark:hover:text-ink-200"
             >
               <ExternalLink className="h-4 w-4" />
             </a>
@@ -33,7 +33,7 @@ export function ProjectCard({ project }: { project: ProjectListItem }) {
       </div>
 
       {project.description && (
-        <p className="mb-3 text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
+        <p className="mb-3 text-sm text-ink-500 dark:text-ink-400 line-clamp-2">
           {project.description}
         </p>
       )}
@@ -44,7 +44,7 @@ export function ProjectCard({ project }: { project: ProjectListItem }) {
         ))}
       </div>
 
-      <p className="mt-3 text-xs text-zinc-400 dark:text-zinc-500">
+      <p className="mt-3 text-xs text-ink-400 dark:text-ink-500">
         Updated {formatRelativeDate(project.updated_at)}
       </p>
     </Link>

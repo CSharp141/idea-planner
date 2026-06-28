@@ -66,17 +66,17 @@ export function AiDemo() {
   return (
     <section
       aria-labelledby="demo-heading"
-      className="bg-gray-900/30 py-24 md:py-32"
+      className="bg-ink-900/30 py-24 md:py-32"
     >
       <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 flex flex-col items-center gap-12">
         <div className="flex flex-col items-center gap-3 text-center">
           <h2
             id="demo-heading"
-            className="text-3xl md:text-4xl font-bold text-white"
+            className="text-3xl md:text-4xl font-display font-bold text-white"
           >
             See what an AI interview looks like.
           </h2>
-          <p className="text-base text-gray-400 max-w-xl">
+          <p className="text-base text-ink-400 max-w-xl">
             The AI asks. You answer. By the end you actually know what you&apos;re building.
           </p>
         </div>
@@ -86,15 +86,15 @@ export function AiDemo() {
           initial="hidden"
           whileInView="visible"
           viewport={VIEWPORT}
-          className="w-full max-w-2xl bg-gray-900 border border-white/10 rounded-2xl overflow-hidden"
+          className="w-full max-w-2xl bg-ink-900 border border-white/10 rounded-2xl overflow-hidden"
         >
           {/* Window chrome */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-gray-950/50">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-ink-950/50">
             <div className="w-3 h-3 rounded-full bg-red-500/70" aria-hidden="true" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/70" aria-hidden="true" />
             <div className="w-3 h-3 rounded-full bg-green-500/70" aria-hidden="true" />
-            <span className="ml-3 text-xs text-gray-600 font-mono">
-              idea-planner — AI interview
+            <span className="ml-3 text-xs text-ink-600 font-mono">
+              preflight — interview session
             </span>
           </div>
 
@@ -102,14 +102,14 @@ export function AiDemo() {
           <div className="p-6 flex flex-col gap-6 min-h-[200px]">
             {/* AI question */}
             <div key={`q-${currentIndex}`} className="flex flex-col gap-1 transition-opacity duration-300">
-              <span className="text-xs font-medium text-indigo-400 font-mono">AI</span>
-              <p className="text-sm text-indigo-300 leading-relaxed">{current.question}</p>
+              <span className="text-xs font-medium text-horizon-400 font-mono">AI</span>
+              <p className="text-sm text-horizon-300 leading-relaxed">{current.question}</p>
             </div>
 
             {/* User answer with typewriter */}
             {displayedAnswer && (
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-medium text-gray-500 font-mono">You</span>
+                <span className="text-xs font-medium text-ink-500 font-mono">You</span>
                 <p className="text-sm text-white leading-relaxed font-mono">
                   {displayedAnswer}
                   <span className="animate-pulse">|</span>

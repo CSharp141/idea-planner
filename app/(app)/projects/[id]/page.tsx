@@ -97,7 +97,7 @@ export default function ProjectDetailPage() {
       {/* Header */}
       <div>
         <div className="mb-1 flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
+          <h1 className="text-2xl font-bold text-ink-900 dark:text-ink-100 leading-tight">
             {project.title}
           </h1>
           <div className="flex shrink-0 items-center gap-2">
@@ -143,7 +143,7 @@ export default function ProjectDetailPage() {
         )}
 
         {project.description && (
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400">{project.description}</p>
+          <p className="mt-2 text-ink-600 dark:text-ink-400">{project.description}</p>
         )}
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -155,7 +155,7 @@ export default function ProjectDetailPage() {
               href={project.github_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 px-2.5 py-0.5 text-xs text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-full border border-ink-200 px-2.5 py-0.5 text-xs text-ink-600 hover:border-ink-400 hover:text-ink-900 dark:border-ink-700 dark:text-ink-400 dark:hover:text-ink-100 transition-colors"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               GitHub
@@ -163,17 +163,17 @@ export default function ProjectDetailPage() {
           )}
         </div>
 
-        <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+        <p className="mt-2 text-xs text-ink-400 dark:text-ink-500">
           Updated {formatRelativeDate(project.updated_at)}
         </p>
       </div>
 
       {/* AI Interview card */}
-      <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
+      <div className="rounded-xl border border-ink-200 bg-white p-5 dark:border-ink-700 dark:bg-ink-800">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">AI Interview</h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <h2 className="font-semibold text-ink-900 dark:text-ink-100">AI Interview</h2>
+            <p className="text-sm text-ink-500 dark:text-ink-400">
               {session?.status === "completed"
                 ? "Interview complete — summary saved below"
                 : "Chat with AI to develop this idea"}

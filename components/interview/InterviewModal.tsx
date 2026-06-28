@@ -104,7 +104,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
       });
 
       if (!res.ok || !res.body) {
-        setStreamError("Failed to reach the AI. Please try again.");
+        setStreamError("Couldn't reach the AI — check your connection and try again.");
         setStatus("idle");
         return;
       }
@@ -139,7 +139,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
               setStreamingContent(assembled);
             } else if (chunk && typeof chunk === "object" && "error" in chunk) {
               const raw = chunk.error as string;
-              let msg = "AI error. Please try again.";
+              let msg = "The AI hit a snag — try sending that again.";
               try {
                 const inner = JSON.parse(raw);
                 if (inner?.error?.code === 429) msg = "AI rate limit reached — please wait a moment and try again.";
@@ -202,18 +202,18 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
   return (
     <Modal open={open} onClose={requestClose} className="max-w-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-700">
+      <div className="flex items-center justify-between border-b border-ink-200 px-5 py-4 dark:border-ink-700">
         <div>
-          <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">AI Interview</h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Answer freely — I&apos;ll help you develop your idea
+          <h2 className="font-semibold text-ink-900 dark:text-ink-100">Preflight interview</h2>
+          <p className="text-xs text-ink-500 dark:text-ink-400">
+            Think out loud — honest answers make a sharper summary.
           </p>
         </div>
         <button
           type="button"
           onClick={requestClose}
           aria-label="Close interview"
-          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+          className="text-ink-400 hover:text-ink-600 dark:hover:text-ink-200"
         >
           <X className="h-5 w-5" />
         </button>
@@ -235,8 +235,8 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
               className={cn(
                 "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
                 msg.role === "user"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200",
+                  ? "bg-signal-500 text-ink-950"
+                  : "bg-ink-100 text-ink-800 dark:bg-ink-700 dark:text-ink-200",
                 i === allMessages.length - 1 && streamingContent && msg.role === "model"
                   ? "after:ml-0.5 after:inline-block after:h-3.5 after:w-0.5 after:animate-pulse after:bg-current after:align-middle"
                   : ""
@@ -252,7 +252,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
           </p>
         )}
         {status === "summarising" && (
-          <div className="flex items-center justify-center gap-2 py-4 text-sm text-zinc-500">
+          <div className="flex items-center justify-center gap-2 py-4 text-sm text-ink-500">
             <Spinner className="h-4 w-4" />
             Generating your project summary…
           </div>
@@ -267,7 +267,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
 
       {/* Input / confirmation panels */}
       {status !== "summarising" && status !== "done" && (
-        <div className="border-t border-zinc-200 p-4 dark:border-zinc-700">
+        <div className="border-t border-ink-200 p-4 dark:border-ink-700">
           {confirmClose ? (
             <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 dark:bg-amber-950/30 dark:border-amber-800">
               <p className="mb-3 text-sm text-amber-800 dark:text-amber-200">
@@ -306,7 +306,7 @@ export function InterviewModal({ projectId, open, onClose }: InterviewModalProps
                 disabled={status === "streaming" || status === "starting"}
                 placeholder="Type your answer… (Enter to send)"
                 rows={2}
-                className="flex-1 resize-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+                className="flex-1 resize-none rounded-lg border border-ink-300 bg-white px-3 py-2 text-sm outline-none focus:border-signal-400 focus:ring-1 focus:ring-signal-400 disabled:opacity-50 dark:border-ink-600 dark:bg-ink-800 dark:text-ink-100"
               />
               <div className="flex flex-col gap-2">
                 <Button

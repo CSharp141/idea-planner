@@ -7,6 +7,33 @@
 
 ---
 
+## ⚠️ 2026-06-28 Rebrand Update (supersedes the v1 spec below)
+
+The site was re-themed to a distinctive "instrument panel / preflight" identity to remove
+generic AI-template tells. Where the spec below references indigo / Geist-only / gradient
+placeholder visuals, the current implementation is:
+
+**Design tokens** — defined in `tailwind.config.ts` (not ad-hoc inline defaults):
+- Neutral ramp `ink` (cool avionics slate, `#0A0E14` → `#F4F6F8`) — replaces all `gray`/`zinc`.
+- Primary accent `signal` (amber, base `#F5A623`) — CTAs, selected state, focus rings. **Amber is
+  light, so solid `bg-signal-500` uses `text-ink-950` (dark) text, never white.**
+- Support accent `horizon` (teal, base `#2DD4BF`) — AI-semantic accents, tags, links. Used sparingly.
+
+**Typography** — heading↔body contrast:
+- Display/headings: **Bricolage Grotesque** (`next/font/google`, `--font-display`, Tailwind `font-display`).
+- Body: **Geist Sans** (`--font-geist-sans`). Mono: **Geist Mono** (`--font-geist-mono`).
+- NB: the v1 `globals.css` forced `font-family: Arial` on `body`, overriding Geist — now fixed.
+
+**Structure / content changes:**
+- Hero canvas: wireframe **navigation globe** (sphere), not the old icosahedron "crystal".
+- Problem: asymmetric lead column + numbered `01/02/03` list (was a symmetric 3-card grid).
+- Features: real browser-framed UI mockups via `components/landing/UiMock.tsx` (was gradient boxes).
+- Social proof: honest "built in the open" cards (the fake `[Placeholder]` testimonials are removed).
+- Shared primitives: `components/ui/Logo.tsx` (replaces ✈️ emoji), `components/ui/Input.tsx`
+  (replaces duplicated input class strings).
+
+---
+
 ## 1. Component Map
 
 All landing page files live under `src/app/(marketing)/` to isolate from the authenticated app shell.

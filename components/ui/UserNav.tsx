@@ -20,10 +20,10 @@ export function UserNav({ email }: UserNavProps) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="hidden sm:block text-sm text-zinc-500 dark:text-zinc-400">{display}</span>
+      <span className="hidden sm:block text-sm text-ink-500 dark:text-ink-400">{display}</span>
       <button
         onClick={signOut}
-        className="text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+        className="text-sm text-ink-500 hover:text-ink-800 dark:text-ink-400 dark:hover:text-ink-200 transition-colors"
       >
         Sign out
       </button>
