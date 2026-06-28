@@ -6,8 +6,8 @@ export function ProjectGrid({ projects }: { projects: ProjectListItem[] }) {
   if (projects.length === 0) {
     return (
       <EmptyState
-        title="No ideas yet"
-        description="Capture your first idea and let AI help you develop it."
+        title="Nothing on the runway yet"
+        description="Add your first idea and run a preflight check on it before you start building."
         action={{ label: "New idea", href: "/projects/new" }}
       />
     );

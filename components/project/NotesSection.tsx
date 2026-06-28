@@ -42,7 +42,7 @@ export function NotesSection({ projectId, initialNotes }: NotesSectionProps) {
   return (
     <section>
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
           Notes
         </h2>
         {!editing && (
@@ -64,11 +64,11 @@ export function NotesSection({ projectId, initialNotes }: NotesSectionProps) {
             onChange={(e) => setDraft(e.target.value)}
             rows={6}
             autoFocus
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 resize-none"
+            className="w-full rounded-lg border border-ink-300 bg-white px-3 py-2 text-sm outline-none focus:border-signal-400 focus:ring-1 focus:ring-signal-400 dark:border-ink-600 dark:bg-ink-800 dark:text-ink-100 resize-none"
             placeholder="Add your notes here…"
           />
           {saveError && (
-            <p className="text-sm text-red-500">Failed to save notes. Please try again.</p>
+            <p className="text-sm text-red-500">Couldn&apos;t save your notes — try again in a moment.</p>
           )}
           <div className="flex gap-2">
             <Button size="sm" onClick={save} disabled={saving}>
@@ -82,11 +82,11 @@ export function NotesSection({ projectId, initialNotes }: NotesSectionProps) {
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
+        <div className="rounded-lg border border-ink-100 bg-ink-50 p-4 dark:border-ink-700 dark:bg-ink-800/50">
           {notes ? (
-            <p className="whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">{notes}</p>
+            <p className="whitespace-pre-wrap text-sm text-ink-700 dark:text-ink-300">{notes}</p>
           ) : (
-            <p className="text-sm text-zinc-400 italic">No notes yet. Click Edit to add some.</p>
+            <p className="text-sm text-ink-400 italic">No notes yet. Click Edit to add some.</p>
           )}
         </div>
       )}

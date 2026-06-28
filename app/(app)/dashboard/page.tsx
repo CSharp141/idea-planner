@@ -99,8 +99,8 @@ export default async function DashboardPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">My Ideas</h1>
-        <span className="text-sm text-zinc-500">
+        <h1 className="text-2xl font-bold text-ink-900 dark:text-ink-100">My Ideas</h1>
+        <span className="text-sm text-ink-500">
           {projects.length} project{projects.length !== 1 ? "s" : ""}
         </span>
       </div>

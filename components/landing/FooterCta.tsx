@@ -16,7 +16,7 @@ export function FooterCta({ stars }: FooterCtaProps) {
     <>
       <section
         aria-labelledby="footer-cta-heading"
-        className="bg-gray-950 py-32 md:py-40"
+        className="bg-ink-950 py-32 md:py-40"
       >
         <motion.div
           variants={fadeSlideUp(reducedMotion)}
@@ -27,16 +27,16 @@ export function FooterCta({ stars }: FooterCtaProps) {
         >
           <h2
             id="footer-cta-heading"
-            className="text-4xl md:text-5xl font-bold text-white"
+            className="text-4xl md:text-5xl font-display font-bold text-white"
           >
             Every great build starts with a preflight check.
           </h2>
-          <p className="text-lg text-gray-400 max-w-md">
+          <p className="text-lg text-ink-400 max-w-md">
             Pilots don&apos;t take off without one. Neither should you. Run your first Preflight check free — no account required to start.
           </p>
           <Link
             href="/login"
-            className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-10 py-4 rounded-full text-base transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+            className="bg-signal-500 hover:bg-signal-400 text-ink-950 font-semibold px-10 py-4 rounded-full text-base transition-colors focus-visible:ring-2 focus-visible:ring-signal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950"
           >
             Run Your First Preflight
           </Link>
@@ -55,16 +55,16 @@ export function FooterCta({ stars }: FooterCtaProps) {
 
       <footer
         role="contentinfo"
-        className="border-t border-white/5 bg-gray-950"
+        className="border-t border-white/5 bg-ink-950"
       >
         <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-600">© 2026 Preflight. All rights reserved.</p>
+          <p className="text-sm text-ink-600">© 2026 Preflight. All rights reserved.</p>
           <nav aria-label="Footer links" className="flex items-center gap-6">
             <a
               href="https://github.com/CSharp141/idea-planner"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-gray-600 hover:text-gray-400 transition-colors"
+              className="text-sm text-ink-600 hover:text-ink-400 transition-colors"
             >
               GitHub
             </a>

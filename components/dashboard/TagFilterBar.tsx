@@ -31,8 +31,8 @@ export function TagFilterBar({ tags }: { tags: Tag[] }) {
         className={cn(
           "rounded-full border px-3 py-1 text-sm transition-colors",
           !active
-            ? "border-indigo-600 bg-indigo-600 text-white"
-            : "border-zinc-300 text-zinc-600 hover:border-indigo-400 dark:border-zinc-600 dark:text-zinc-300"
+            ? "border-signal-500 bg-signal-500 text-ink-950"
+            : "border-ink-300 text-ink-600 hover:border-signal-400 dark:border-ink-600 dark:text-ink-300"
         )}
       >
         All
@@ -46,8 +46,8 @@ export function TagFilterBar({ tags }: { tags: Tag[] }) {
           className={cn(
             "rounded-full border px-3 py-1 text-sm transition-colors",
             active === tag.name
-              ? "border-indigo-600 bg-indigo-600 text-white"
-              : "border-zinc-300 text-zinc-600 hover:border-indigo-400 dark:border-zinc-600 dark:text-zinc-300"
+              ? "border-signal-500 bg-signal-500 text-ink-950"
+              : "border-ink-300 text-ink-600 hover:border-signal-400 dark:border-ink-600 dark:text-ink-300"
           )}
         >
           #{tag.name}

@@ -29,7 +29,7 @@ export default function EditProjectPage() {
   if (error) {
     return (
       <div className="mx-auto max-w-xl py-24 text-center">
-        <p className="text-sm text-red-500">Failed to load project. Please go back and try again.</p>
+        <p className="text-sm text-red-500">Couldn&apos;t load this idea. Go back and try again.</p>
       </div>
     );
   }
@@ -44,7 +44,7 @@ export default function EditProjectPage() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="mb-6 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Edit Idea</h1>
+      <h1 className="mb-6 text-2xl font-bold text-ink-900 dark:text-ink-100">Edit Idea</h1>
       <ProjectForm
         mode="edit"
         initial={{

@@ -7,20 +7,21 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
 
-function IcosahedronMesh() {
+function NavGlobe() {
   const meshRef = useRef<THREE.Mesh>(null);
   const reducedMotion = useReducedMotion();
 
   useFrame(() => {
     if (!meshRef.current || reducedMotion) return;
-    meshRef.current.rotation.x += 0.002;
-    meshRef.current.rotation.y += 0.003;
+    // Slow axial spin, like an instrument navigation globe.
+    meshRef.current.rotation.y += 0.0016;
   });
 
+  // Meridians/parallels wireframe reads as a radar/navigation globe.
   return (
-    <mesh ref={meshRef} scale={2.2}>
-      <icosahedronGeometry args={[1, 1]} />
-      <meshBasicMaterial color="#4f46e5" wireframe transparent opacity={0.25} />
+    <mesh ref={meshRef} scale={2.2} rotation={[0.35, 0, 0.1]}>
+      <sphereGeometry args={[1, 24, 16]} />
+      <meshBasicMaterial color="#2DD4BF" wireframe transparent opacity={0.18} />
     </mesh>
   );
 }
@@ -34,9 +35,9 @@ export default function HeroCanvas() {
       className="pointer-events-none"
     >
       <ambientLight intensity={0.3} />
-      <pointLight position={[5, 5, 5]} intensity={0.8} color="#6366f1" />
-      <pointLight position={[-5, -5, -5]} intensity={0.4} color="#7c3aed" />
-      <IcosahedronMesh />
+      <pointLight position={[5, 5, 5]} intensity={0.8} color="#F5B53C" />
+      <pointLight position={[-5, -5, -5]} intensity={0.4} color="#2DD4BF" />
+      <NavGlobe />
     </Canvas>
   );
 }

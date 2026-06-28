@@ -49,3 +49,8 @@ SESSION_HANDOFF.md
 
 # claude code mcp config
 .mcp.json
+
+# screenshot & browser-automation artifacts
+test-*.png
+redesign-*.png
+.playwright-mcp/

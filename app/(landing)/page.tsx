@@ -31,7 +31,7 @@ export default async function LandingPage() {
   const stars = await getGitHubStars();
 
   return (
-    <div className="bg-gray-950 font-sans">
+    <div className="bg-ink-950 font-sans">
       <Nav />
       <main>
         <Hero />

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { Input, Textarea } from "@/components/ui/Input";
 import { TagInput } from "./TagInput";
 
 interface ProjectFormProps {
@@ -49,7 +50,7 @@ export function ProjectForm({ initial, mode }: ProjectFormProps) {
 
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error ?? "Something went wrong");
+      setError(data.error ?? "Couldn't save this idea — check the fields and try again.");
       setSaving(false);
       return;
     }
@@ -59,56 +60,50 @@ export function ProjectForm({ initial, mode }: ProjectFormProps) {
     router.push(`/projects/${project.id}`);
   }
 
-  const fieldClass =
-    "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100";
-
   return (
     <form onSubmit={submit} className="space-y-5">
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <label className="mb-1.5 block text-sm font-medium text-ink-700 dark:text-ink-300">
           Title <span className="text-red-500">*</span>
         </label>
-        <input
+        <Input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="What are you building?"
-          className={fieldClass}
           autoFocus
         />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <label className="mb-1.5 block text-sm font-medium text-ink-700 dark:text-ink-300">
           Description
         </label>
-        <textarea
+        <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Brief overview (optional)"
           rows={3}
-          className={`${fieldClass} resize-none`}
         />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <label className="mb-1.5 block text-sm font-medium text-ink-700 dark:text-ink-300">
           Tags
         </label>
         <TagInput value={tags} onChange={setTags} />
-        <p className="mt-1 text-xs text-zinc-400">Press Enter or comma to add a tag</p>
+        <p className="mt-1 text-xs text-ink-400">Press Enter or comma to add a tag</p>
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <label className="mb-1.5 block text-sm font-medium text-ink-700 dark:text-ink-300">
           GitHub URL
         </label>
-        <input
+        <Input
           type="url"
           value={githubUrl}
           onChange={(e) => setGithubUrl(e.target.value)}
           placeholder="https://github.com/username/repo"
-          className={fieldClass}
         />
       </div>
 

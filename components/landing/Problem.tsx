@@ -35,35 +35,51 @@ export function Problem() {
   return (
     <section
       aria-labelledby="problem-heading"
-      className="bg-gray-900/50 py-24 md:py-32"
+      className="bg-ink-900/50 py-24 md:py-32"
     >
-      <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8">
-        <h2
-          id="problem-heading"
-          className="text-3xl md:text-4xl font-bold text-white text-center mb-16"
-        >
-          Sound familiar?
-        </h2>
+      <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 grid gap-12 md:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+        {/* Lead column */}
+        <div className="md:sticky md:top-28 md:self-start flex flex-col gap-4">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-signal-400">The problem</span>
+          <h2
+            id="problem-heading"
+            className="text-3xl md:text-4xl font-display font-bold text-white"
+          >
+            Sound familiar?
+          </h2>
+          <p className="text-base text-ink-400 leading-relaxed">
+            Every developer has a graveyard of half-thought ideas. The problem isn&apos;t a lack of
+            ideas — it&apos;s that they never get the ten minutes of honest thinking they deserve.
+          </p>
+        </div>
 
-        <motion.div
+        {/* Numbered problem list */}
+        <motion.ol
           variants={staggerContainer()}
           initial="hidden"
           whileInView="visible"
           viewport={VIEWPORT}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8"
+          className="flex flex-col"
         >
-          {CARDS.map((card) => (
-            <motion.article
+          {CARDS.map((card, i) => (
+            <motion.li
               key={card.title}
               variants={fadeSlideUp(reducedMotion)}
-              className="bg-gray-800/50 border border-white/10 rounded-2xl p-8 hover:border-indigo-500/50 transition-colors duration-300 flex flex-col gap-4"
+              className="group flex gap-5 border-t border-white/10 py-7 first:border-t-0 first:pt-0"
             >
-              <card.Icon className="w-8 h-8 text-indigo-400" aria-hidden="true" />
-              <h3 className="text-xl font-semibold text-white">{card.title}</h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{card.description}</p>
-            </motion.article>
+              <span className="font-mono text-sm text-ink-600 pt-1 tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2.5">
+                  <card.Icon className="w-5 h-5 text-signal-400 shrink-0" aria-hidden="true" />
+                  <h3 className="text-lg font-semibold text-white">{card.title}</h3>
+                </div>
+                <p className="text-sm text-ink-400 leading-relaxed">{card.description}</p>
+              </div>
+            </motion.li>
           ))}
-        </motion.div>
+        </motion.ol>
       </div>
     </section>
   );
